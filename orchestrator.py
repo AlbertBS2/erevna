@@ -8,12 +8,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from research_structure_agent import ResearchStructureAgent
 from validity_threat_agent import ValidityThreatAgent
 from literature_scout_agent import LiteratureScoutAgent
-from schemas import (
-    AnalysisOutput,
-    ResearchStructureOutput,
-    ValidityThreatOutput,
-    LiteratureScoutOutput,
-)
 
 
 class ResearchAnalysisOrchestrator:
@@ -44,7 +38,7 @@ class ResearchAnalysisOrchestrator:
         self.validity_agent = ValidityThreatAgent(api_key, model)
         self.literature_agent = LiteratureScoutAgent(api_key, model)
     
-    def analyze(self, text: str, parallel: bool = True) -> AnalysisOutput:
+    def analyze(self, text: str, parallel: bool = True) -> dict:
         """
         Run all agents on the research text.
 
@@ -53,7 +47,7 @@ class ResearchAnalysisOrchestrator:
             parallel: If True, run downstream agents in parallel.
 
         Returns:
-            AnalysisOutput containing results from all three agents
+            Dictionary containing results from all three agents
         """
         research_json = self.research_agent.get_response(text)
         research_structure = self._parse_research_structure(research_json)
@@ -67,15 +61,15 @@ class ResearchAnalysisOrchestrator:
                 research_json
             )
 
-        return AnalysisOutput(
-            research_structure=research_structure,
-            validity_threats=validity_threats,
-            literature_scout=literature_scout,
-        )
+        return {
+            "research_structure": research_structure,
+            "validity_threats": validity_threats,
+            "literature_scout": literature_scout,
+        }
     
     def _analyze_downstream_parallel(
         self, research_json: str
-    ) -> tuple[ValidityThreatOutput, LiteratureScoutOutput]:
+    ) -> tuple[dict, dict]:
         """Run downstream agents in parallel using the research JSON."""
         results: dict[str, object] = {}
 
@@ -96,12 +90,12 @@ class ResearchAnalysisOrchestrator:
                 except Exception as e:
                     print(f"Error in {agent_name}: {e}")
                     if agent_name == "validity_threats":
-                        results[agent_name] = ValidityThreatOutput(
-                            mitigation_suggestions=[f"Error: {str(e)}"]
+                        results[agent_name] = self._default_validity_threats(
+                            error=f"Error: {str(e)}"
                         )
                     else:
-                        results[agent_name] = LiteratureScoutOutput(
-                            inferred_topics=[f"Error: {str(e)}"]
+                        results[agent_name] = self._default_literature_scout(
+                            error=f"Error: {str(e)}"
                         )
 
         validity_output = results.get("validity_threats")
@@ -113,13 +107,13 @@ class ResearchAnalysisOrchestrator:
             literature_output = self._parse_literature_scout(literature_output)
 
         return (
-            validity_output or ValidityThreatOutput(),
-            literature_output or LiteratureScoutOutput(),
+            validity_output or self._default_validity_threats(),
+            literature_output or self._default_literature_scout(),
         )
     
     def _analyze_downstream_sequential(
         self, research_json: str
-    ) -> tuple[ValidityThreatOutput, LiteratureScoutOutput]:
+    ) -> tuple[dict, dict]:
         """Run downstream agents sequentially using the research JSON."""
         validity_response = self.validity_agent.get_response(research_json)
         literature_response = self.literature_agent.get_response(research_json)
@@ -129,34 +123,46 @@ class ResearchAnalysisOrchestrator:
 
         return validity_threats, literature_scout
 
-    def _parse_research_structure(self, response: str) -> ResearchStructureOutput:
+    def _parse_research_structure(self, response: str) -> dict:
         try:
             parsed = json.loads(response)
-            return ResearchStructureOutput(**parsed)
+            if isinstance(parsed, dict):
+                return self._merge_defaults(self._default_research_structure(), parsed)
+            return self._default_research_structure(
+                error="Failed to parse research structure: JSON is not an object"
+            )
         except Exception as e:
-            return ResearchStructureOutput(
-                missing_elements=[f"Failed to parse research structure: {str(e)}"]
+            return self._default_research_structure(
+                error=f"Failed to parse research structure: {str(e)}"
             )
 
-    def _parse_validity_threats(self, response: str) -> ValidityThreatOutput:
+    def _parse_validity_threats(self, response: str) -> dict:
         try:
             parsed = json.loads(response)
-            return ValidityThreatOutput(**parsed)
+            if isinstance(parsed, dict):
+                return self._merge_defaults(self._default_validity_threats(), parsed)
+            return self._default_validity_threats(
+                error="Failed to parse validity threats: JSON is not an object"
+            )
         except Exception as e:
-            return ValidityThreatOutput(
-                mitigation_suggestions=[f"Failed to parse validity threats: {str(e)}"]
+            return self._default_validity_threats(
+                error=f"Failed to parse validity threats: {str(e)}"
             )
 
-    def _parse_literature_scout(self, response: str) -> LiteratureScoutOutput:
+    def _parse_literature_scout(self, response: str) -> dict:
         try:
             parsed = json.loads(response)
-            return LiteratureScoutOutput(**parsed)
+            if isinstance(parsed, dict):
+                return self._merge_defaults(self._default_literature_scout(), parsed)
+            return self._default_literature_scout(
+                error="Failed to parse literature scout: JSON is not an object"
+            )
         except Exception as e:
-            return LiteratureScoutOutput(
-                inferred_topics=[f"Failed to parse literature scout: {str(e)}"]
+            return self._default_literature_scout(
+                error=f"Failed to parse literature scout: {str(e)}"
             )
     
-    def analyze_and_print(self, text: str, parallel: bool = True) -> AnalysisOutput:
+    def analyze_and_print(self, text: str, parallel: bool = True) -> dict:
         """
         Analyze research text and print formatted results.
         
@@ -165,7 +171,7 @@ class ResearchAnalysisOrchestrator:
             parallel: If True, run agents in parallel
             
         Returns:
-            AnalysisOutput containing all results
+            Dictionary containing all results
         """
         print("🔍 Starting Research Analysis...\n")
         
@@ -175,15 +181,19 @@ class ResearchAnalysisOrchestrator:
         print("=" * 80)
         print("📋 RESEARCH STRUCTURE")
         print("=" * 80)
-        print(f"Research Question: {results.research_structure.research_question}")
-        print(f"Hypothesis: {results.research_structure.hypothesis}")
-        print(f"Method: {results.research_structure.method}")
-        print(f"Variables: {', '.join(results.research_structure.variables) if results.research_structure.variables else 'None specified'}")
-        print(f"Dataset: {results.research_structure.dataset}")
-        print(f"Evaluation: {results.research_structure.evaluation}")
-        if results.research_structure.missing_elements:
+        research_structure = results["research_structure"]
+        print(f"Research Question: {research_structure.get('research_question')}")
+        print(f"Hypothesis: {research_structure.get('hypothesis')}")
+        print(f"Method: {research_structure.get('method')}")
+        variables = research_structure.get("variables") or []
+        print(
+            f"Variables: {', '.join(variables) if variables else 'None specified'}"
+        )
+        print(f"Dataset: {research_structure.get('dataset')}")
+        print(f"Evaluation: {research_structure.get('evaluation')}")
+        if research_structure.get("missing_elements"):
             print("\n⚠️  Missing Elements:")
-            for elem in results.research_structure.missing_elements:
+            for elem in research_structure.get("missing_elements", []):
                 print(f"  • {elem}")
         
         # Print Validity Threats
@@ -191,29 +201,30 @@ class ResearchAnalysisOrchestrator:
         print("⚠️  VALIDITY THREATS")
         print("=" * 80)
         
-        if results.validity_threats.internal_validity:
+        validity_threats = results["validity_threats"]
+        if validity_threats.get("internal_validity"):
             print("\n🔴 Internal Validity:")
-            for threat in results.validity_threats.internal_validity:
+            for threat in validity_threats.get("internal_validity", []):
                 print(f"  • {threat}")
         
-        if results.validity_threats.external_validity:
+        if validity_threats.get("external_validity"):
             print("\n🟠 External Validity:")
-            for threat in results.validity_threats.external_validity:
+            for threat in validity_threats.get("external_validity", []):
                 print(f"  • {threat}")
         
-        if results.validity_threats.construct_validity:
+        if validity_threats.get("construct_validity"):
             print("\n🟡 Construct Validity:")
-            for threat in results.validity_threats.construct_validity:
+            for threat in validity_threats.get("construct_validity", []):
                 print(f"  • {threat}")
         
-        if results.validity_threats.conclusion_validity:
+        if validity_threats.get("conclusion_validity"):
             print("\n🟢 Conclusion Validity:")
-            for threat in results.validity_threats.conclusion_validity:
+            for threat in validity_threats.get("conclusion_validity", []):
                 print(f"  • {threat}")
         
-        if results.validity_threats.mitigation_suggestions:
+        if validity_threats.get("mitigation_suggestions"):
             print("\n💡 Mitigation Suggestions:")
-            for suggestion in results.validity_threats.mitigation_suggestions:
+            for suggestion in validity_threats.get("mitigation_suggestions", []):
                 print(f"  • {suggestion}")
         
         # Print Literature Scout
@@ -221,19 +232,20 @@ class ResearchAnalysisOrchestrator:
         print("📚 LITERATURE SCOUT")
         print("=" * 80)
         
-        if results.literature_scout.inferred_topics:
+        literature_scout = results["literature_scout"]
+        if literature_scout.get("inferred_topics"):
             print("\n🎯 Inferred Topics:")
-            for topic in results.literature_scout.inferred_topics:
+            for topic in literature_scout.get("inferred_topics", []):
                 print(f"  • {topic}")
         
-        if results.literature_scout.search_queries:
+        if literature_scout.get("search_queries"):
             print("\n🔎 Search Queries:")
-            for query in results.literature_scout.search_queries:
+            for query in literature_scout.get("search_queries", []):
                 print(f"  • {query}")
         
-        if results.literature_scout.example_related_work:
+        if literature_scout.get("example_related_work"):
             print("\n📄 Example Related Work:")
-            for work in results.literature_scout.example_related_work:
+            for work in literature_scout.get("example_related_work", []):
                 print(f"  • {work}")
         
         print("\n" + "=" * 80)
@@ -241,3 +253,46 @@ class ResearchAnalysisOrchestrator:
         print("=" * 80)
         
         return results
+
+    def _default_research_structure(self, error: Optional[str] = None) -> dict:
+        base = {
+            "research_question": "Not specified",
+            "hypothesis": "Not specified",
+            "method": "Not specified",
+            "variables": [],
+            "dataset": "Not specified",
+            "evaluation": "Not specified",
+            "missing_elements": [],
+        }
+        if error:
+            base["missing_elements"].append(error)
+        return base
+
+    def _default_validity_threats(self, error: Optional[str] = None) -> dict:
+        base = {
+            "internal_validity": [],
+            "external_validity": [],
+            "construct_validity": [],
+            "conclusion_validity": [],
+            "mitigation_suggestions": [],
+        }
+        if error:
+            base["mitigation_suggestions"].append(error)
+        return base
+
+    def _default_literature_scout(self, error: Optional[str] = None) -> dict:
+        base = {
+            "inferred_topics": [],
+            "search_queries": [],
+            "example_related_work": [],
+        }
+        if error:
+            base["inferred_topics"].append(error)
+        return base
+
+    def _merge_defaults(self, defaults: dict, parsed: dict) -> dict:
+        merged = defaults.copy()
+        for key, value in parsed.items():
+            if key in merged:
+                merged[key] = value
+        return merged

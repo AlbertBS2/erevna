@@ -30,10 +30,9 @@ A modular multi-agentic architecture that uses LangChain and Google's Gemini API
 ## Architecture
 
 - **Modular agent classes**: Each agent is independent and reusable
-- **Typed schemas**: Pydantic models for type-safe outputs
 - **Orchestrator graph**: Coordinates agents with parallel or sequential execution
 - **Environment-based config**: API keys from environment variables
-- **Minimal dependencies**: Only essential packages (LangChain, Gemini, Pydantic)
+- **Minimal dependencies**: Only essential packages (LangChain, Gemini)
 
 ## Installation
 
@@ -96,15 +95,14 @@ erevna/
 ├── research_structure_agent.py  # Agent 1: Extract research components
 ├── validity_threat_agent.py     # Agent 2: Analyze validity threats
 ├── literature_scout_agent.py    # Agent 3: Suggest related work
-├── schemas.py                   # Pydantic models for typed outputs
 ├── requirements.txt             # Python dependencies
 ├── .env.example                 # Environment variables template
 └── README.md                    # This file
 ```
 
-## Output Schema
+## Output Format
 
-All agents return JSON-compatible Pydantic models:
+All agents return JSON-compatible dictionaries:
 
 ```python
 {

@@ -1,14 +1,7 @@
 """Research Structure Agent for extracting research components."""
 
-import json
-from typing import Dict, Any
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate
-from schemas import ResearchStructureOutput
 from google import genai
 from google.genai import types
-from dotenv import load_dotenv
-import os
 
 
 class ResearchStructureAgent:
