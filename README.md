@@ -112,8 +112,7 @@ All agents return JSON-compatible dictionaries:
     "method": str,
     "variables": List[str],
     "dataset": str,
-    "evaluation": str,
-    "missing_elements": List[str]
+    "evaluation": str
   },
   "validity_threats": {
     "internal_validity": List[str],
@@ -123,8 +122,6 @@ All agents return JSON-compatible dictionaries:
     "mitigation_suggestions": List[str]
   },
   "literature_scout": {
-    "inferred_topics": List[str],
-    "search_queries": List[str],
     "example_related_work": List[str]
   }
 }

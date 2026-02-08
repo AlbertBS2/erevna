@@ -119,3 +119,25 @@ response = requests.post("http://localhost:8000/analyze", json=payload, timeout=
 response.raise_for_status()
 data = response.json()
 print(data)
+
+# API Call response
+# {
+#   "research_structure": {
+#     "research_question": str,
+#     "hypothesis": str,
+#     "method": str,
+#     "variables": List[str],
+#     "dataset": str,
+#     "evaluation": str
+#   },
+#   "validity_threats": {
+#     "internal_validity": List[str],
+#     "external_validity": List[str],
+#     "construct_validity": List[str],
+#     "conclusion_validity": List[str],
+#     "mitigation_suggestions": List[str]
+#   },
+#   "literature_scout": {
+#     "example_related_work": List[str]
+#   }
+# }
