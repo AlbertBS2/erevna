@@ -21,7 +21,7 @@ class LiteratureScoutAgent:
         """
 
         # System instructions
-        sys_instructions = f"""You are an expert research librarian and domain expert. Based on the given information about the ongoing research:
+        sys_instructions = f"""You are an expert research librarian and domain expert. Based on the given information on the Ongoing Research Structured Summary:
 
 **Suggest example paper titles**: Generate realistic example titles of papers (with their authors) that would be related to this research (these can be synthetic but should be plausible and informative)
 
@@ -33,10 +33,15 @@ You MUST respond with ONLY a valid JSON object in this exact format:
 Generate at least 3-5 items. Do not include any text before or after the JSON. Avoid any markdown formatting.
         """
 
+        query = f"""Ongoing Research Structured Summary:
+
+{research_text}
+        """
+
         # Generate a response from the llm
         response = self.client.models.generate_content(
             model=self.model,
-            contents=research_text,
+            contents=query,
             config=types.GenerateContentConfig(
                 temperature=0.0,
                 system_instruction=sys_instructions

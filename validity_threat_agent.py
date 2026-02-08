@@ -20,15 +20,16 @@ class ValidityThreatAgent:
         """
 
         # System instructions
-        sys_instructions = f"""You are an expert research analyst. Analyze the given research text and identify potential validity threats.
+        sys_instructions = f"""You are an expert research analyst. Analyze the given Ongoing Research Structured Summary and identify potential validity threats.
 
-Identify potential validity threats in the research text, categorizing them into internal, external, construct, and conclusion validity, based on the Validity Definition provided. For each category, provide a brief description of the identified threats. Additionally, suggest practical mitigation strategies for each identified threat to enhance the overall validity of the research.
+Identify potential validity threats in the Ongoing Research Structured Summary, categorizing them into internal, external, construct, and conclusion validity, based on the Validity Definition provided. For each category, provide a brief description of the identified threats. Additionally, suggest practical mitigation strategies for each identified threat to enhance the overall validity of the research.
 
 
 \n--\n
 Validity definition:
 
-Given our objective to support the generation of hypotheses explaining a social system, a crucial question is whether the results of our analysis are valid. Validity concerns the relationship between our theory, theoretical concepts, and results,
+Given our objective to support the generation of hypotheses explaining a social system, a crucial 
+question is whether the results of our analysis are valid. Validity concerns the relationship between our theory, theoretical concepts, and results,
 and the system under study. This is a classic issue in social research, which
 remains relevant when using digital data, albeit with some additional complexities.
 Figure 1.6 can help clarify di!erent types of validity and should be used in practice
@@ -43,8 +44,7 @@ theory of SO , this does not guarantee external validity, that is, the applicabi
 of our theory to ST . Randomised controlled trials are examples where, through
 random assignment to the treatment and control groups, we can obtain a high
 internal validity (for SO ) but cannot conclude that the results will apply to ST
-as well.
-A second potential source of validity issues is that the data is not the same as
+as well. A second potential source of validity issues is that the data is not the same as
 the observed system: it is not a neutral representation, as someone must have
 decided which aspects to collect and which to omit, introducing biases. I will
 call this data validity. Data can be organised as a set of observables measured
@@ -55,7 +55,8 @@ data (understood here as a model of the system at a certain level of abstraction
 following Floridi (2008)) is the result of explicit and implicit assumptions made
 during the data collection process, and is, for example, constrained by meta-
 model (the model defining how the data is structured). This could be something
-like an Entity-Relationship conceptual meta-model, a relational meta-model, a data matrix, a network, text describing the system, or images/videos depicting
+like an Entity-Relationship conceptual meta-model, a relational meta-model, a data matrix, 
+a network, text describing the system, or images/videos depicting
 it. Data is never raw, it has always been designed and processed.
 In addition to being shaped by the decisions involved in data collection and
 constrained by its meta-model, the data may also su!er from quality issues: the
@@ -97,7 +98,8 @@ documented, even accuracy that is too low to fully support our conclusions can
 generate valuable hypotheses.
 Finally, theory is often expressed in terms of concepts that are meaningful to
 human beings, whereas machine learning and data mining models are data-driven,
-so expressed in terms of variables in the data. Construct validity refers to the extent to which the entities in our models (that is, what can be measured)
+so expressed in terms of variables in the data. Construct validity refers to the 
+extent to which the entities in our models (that is, what can be measured)
 correspond to the concepts in our theory. For example: do retweets (what we
 measure) represent “endorsement” (a theoretical concept), “criticism”, or simply
 “attention”? Do they indicate “influence”? Do clusters of social media accounts
@@ -120,10 +122,15 @@ You MUST respond with ONLY a valid JSON object in this exact format:
 Do not include any text before or after the JSON. Avoid any markdown formatting.
         """
 
+        query = f"""Ongoing Research Structured Summary:
+
+{research_text}
+        """
+
         # Generate a response from the llm
         response = self.client.models.generate_content(
             model=self.model,
-            contents=research_text,
+            contents=query,
             config=types.GenerateContentConfig(
                 temperature=0.0,
                 system_instruction=sys_instructions
