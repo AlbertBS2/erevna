@@ -1,22 +1,7 @@
 import requests
 
 payload = {
-    "text": """y
-November 26, 2025
-1 REMOVED
-REMOVED
-Contents
-1 Title 3
-2 Abstract 3
-3 Background 3
-4 Description of Tasks 4
-5 Methods 4
-6 Relevant Courses 5
-7 Delimitations 5
-8 Time Plan 5
-2 REMOVED
-REMOVED
-REMOVED
+    "text": """
 1 Title
 Efficient Knowledge Transfer in Federated Learning for Heterogeneous Au-
 tonomous Driving Systems
@@ -47,9 +32,6 @@ knowledge transfer between diverse models and hardware setups, ensuring
 that learning can continue even when architectures change. The work will
 use the Zenseact Open Dataset [1] and also explore knowledge distillation in
 a federated learning context.
-3 REMOVED
-REMOVED
-REMOVED
 4 Description of Tasks
 The project will involve the design, development, training, implementation,
 and evaluation of machine learning models, knowledge distillation methods,
@@ -77,9 +59,6 @@ bustness across sensor and hardware shifts, inference efficiency.
 simulation environments, GPU-accelerated training, version control (Git).
 • Literature: Knowledge distillation, heterogeneous model adaptation,
 multimodal learning, federated learning in autonomous systems.
-4 REMOVED
-REMOVED
-REMOVED
 6 Relevant Courses
 • 1RT720 - Deep Learning
 • 1RT700 - Statistical Machine Learning
@@ -106,9 +85,6 @@ models, hyperparameter tuning, and multimodal experiments. (weeks
 13-16)
 • Simulation-based validation. Performance analysis and comparison to
 baselines. (weeks 17-18)
-5 REMOVED
-REMOVED
-REMOVED
 • Report writing, refinement, preparation for presentation. (weeks 19-20)
 Report writing will also be done in parallel to the detailed tasks throughout
 most of the weeks. Frequent meetings with supervisor throughout.""",
