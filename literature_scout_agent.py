@@ -21,22 +21,16 @@ class LiteratureScoutAgent:
         """
 
         # System instructions
-        sys_instructions = f"""You are an expert research librarian and domain expert. Based on the research text:
+        sys_instructions = f"""You are an expert research librarian and domain expert. Based on the given information about the ongoing research:
 
-1. **Infer research areas and topics**: Identify the main research domains, subfields, and cross-disciplinary areas
-
-2. **Suggest search queries**: Create effective search keywords and queries for finding related literature (include both broad and specific queries)
-
-3. **Suggest example paper titles**: Generate realistic example titles of papers that would be related to this research (these can be synthetic but should be plausible and informative)
+**Suggest example paper titles**: Generate realistic example titles of papers (with their authors) that would be related to this research (these can be synthetic but should be plausible and informative)
 
 You MUST respond with ONLY a valid JSON object in this exact format:
 {{
-  "inferred_topics": ["topic 1", "topic 2", "topic 3"],
-  "search_queries": ["query 1", "query 2", "query 3"],
-  "example_related_work": ["Example Title 1", "Example Title 2", "Example Title 3"]
+  "example_related_work": ["Paper 1", "Paper 2", "Paper 3", ..., "Paper n"]
 }}
 
-Generate at least 3-5 items for each category. Do not include any text before or after the JSON. Avoid any markdown formatting.
+Generate at least 3-5 items. Do not include any text before or after the JSON. Avoid any markdown formatting.
         """
 
         # Generate a response from the llm
