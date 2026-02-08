@@ -261,8 +261,7 @@ class ResearchAnalysisOrchestrator:
             "method": "Not specified",
             "variables": [],
             "dataset": "Not specified",
-            "evaluation": "Not specified",
-            "missing_elements": [],
+            "evaluation": "Not specified"
         }
         if error:
             base["missing_elements"].append(error)
