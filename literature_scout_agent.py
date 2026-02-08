@@ -30,7 +30,7 @@ You MUST respond with ONLY a valid JSON object in this exact format:
   "example_related_work": ["Paper 1", "Paper 2", "Paper 3", ..., "Paper n"]
 }}
 
-Generate at least 3-5 items. Do not include any text before or after the JSON. Avoid any markdown formatting.
+Generate at least 3-5 items if the given Ongoing Research Structured Summary is sufficiently detailed. If not, generate an empty list. Do not include any text before or after the JSON. Avoid any markdown formatting.
         """
 
         query = f"""Ongoing Research Structured Summary:
