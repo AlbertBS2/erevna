@@ -282,8 +282,6 @@ class ResearchAnalysisOrchestrator:
 
     def _default_literature_scout(self, error: Optional[str] = None) -> dict:
         base = {
-            "inferred_topics": [],
-            "search_queries": [],
             "example_related_work": [],
         }
         if error:
