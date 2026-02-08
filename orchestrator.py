@@ -38,7 +38,7 @@ class ResearchAnalysisOrchestrator:
         self.validity_agent = ValidityThreatAgent(api_key, model)
         self.literature_agent = LiteratureScoutAgent(api_key, model)
     
-    def analyze(self, text: str, parallel: bool = True) -> dict:
+    def analyze(self, text: str, parallel: bool = False) -> dict:
         """
         Run all agents on the research text.
 

@@ -118,4 +118,4 @@ most of the weeks. Frequent meetings with supervisor throughout.""",
 response = requests.post("http://localhost:8000/analyze", json=payload, timeout=300)
 response.raise_for_status()
 data = response.json()
-print(data["research_structure"]["research_question"])
+print(data)
