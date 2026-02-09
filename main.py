@@ -5,10 +5,21 @@ from dotenv import load_dotenv
 
 from orchestrator import ResearchAnalysisOrchestrator
 
+from fastapi.middleware.cors import CORSMiddleware
+
 load_dotenv()
 
 app = FastAPI(title="Erevna Research Analysis API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+@app.get("/")
+def read_root():
+    return {"message": "Erevna."}
 
 @app.post("/analyze")
 def analyze_research(payload: dict = Body(...)) -> dict:
@@ -29,6 +40,6 @@ def analyze_research(payload: dict = Body(...)) -> dict:
             )
 
         orchestrator = ResearchAnalysisOrchestrator()
-        return orchestrator.analyze(text, parallel=parallel)
+        return orchestrator.analyze(text, parallel=False)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
